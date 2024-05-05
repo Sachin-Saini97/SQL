@@ -1,0 +1,46 @@
+-- write an sql to find details of employees with 3rd highest salary in each department
+-- in case there are less than 3 employees in a department then return employee details with lowest salary in that dep.
+
+/*
+create TABLE `employee`(
+	`id` int unsigned not null auto_increment,
+	`emp_id` int unsigned not null,
+    `emp_name` varchar(225) not null,
+    `salary` int not null,
+    `dep_id` int unsigned not null,
+    `dep_name` varchar(200) not null,
+    primary key `id` (`id`)
+)engine = innodb;
+*/
+
+/*
+insert into `employee`(emp_id, emp_name, salary, dep_id, dep_name) values (1, 'Ankit', 14300, 100, 'Analytics'),
+(1, 'Ankit', 14300, 100, 'Analytics'),
+(3, 'Vikas', 12100, 100, 'Analytics'),
+(4, 'Rohit', 7260, 100, 'Analytics'),
+(6, 'Agam', 15600, 200, 'IT'),
+(5, 'Mudit', 15000, 200, 'IT'),
+(2, 'Mohit', 14000, 200, 'IT'),
+(7, 'Sanjay', 12000, 200, 'IT'),
+(8, 'Ashish', 7200, 200, 'IT'),
+(10, 'Rakesh', 8000, 300, 'HR'),
+(9, 'Mukesh', 7000, 300, 'HR'),
+(11, 'Akhil', 4000, 500, 'Ops');
+*/
+
+
+The RANK() function is a window function could be used in SQL Server to calculate a rank for each row within
+a partition of a result set.
+
+The same rank is assigned to the rows in a partition which have the same values.
+The rank of the first row is 1. The ranks may not be consecutive in the RANK() function as it adds the number of repeated rows to
+the repeated rank to calculate the rank of the next row.
+
+-- start query
+with emp as
+(select emp_id, emp_name, salary, dep_id, dep_name
+,rank() Over(partition by dep_id order by salary desc) as rnk
+,count(1) over(partition by dep_id) as cnt
+from employee)
+select * from emp where rnk = 3 or (cnt<3 and rnk=cnt);
+-- end query
